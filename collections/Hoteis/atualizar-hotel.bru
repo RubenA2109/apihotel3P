@@ -1,0 +1,20 @@
+meta {
+  name: atualizar-hotel
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.example.com
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nome": "Hotel Oficina", 
+    "estrelas": 4.5,
+    "diaria": 99.99,
+    "nome": "Caldas da Saude"
+  }
+}
