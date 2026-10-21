@@ -4,8 +4,8 @@ meta {
   seq: 1
 }
 
-get {
-  url: https:/127.0.0.1:5000/hoteis/oficina
+post {
+  url: http:/127.0.0.1:5000/hoteis/oficina
   body: json
   auth: none
 }
@@ -15,6 +15,6 @@ body:json {
     "nome": "Hotel Oficina", 
     "estrelas": 4.7,
     "diaria": 92.99,
-    "nome": "Caldas da Saude"
-  }
+    "cidade": "Caldas da Saude"
+  } 
 }

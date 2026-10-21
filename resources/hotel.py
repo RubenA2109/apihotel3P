@@ -1,47 +1,56 @@
-from flask_restful import Resource,reqparse
-
-lista_hoteis = [
-    {"hotel_id": "sky","nome": "Hotel sky", "estrelas": 4.8, "diaria": 195.99, "cidade": "Porto"},
-    {"hotel_id": "sky1","nome": "Hotel sky1", "estrelas": 4.8, "diaria": 195.99, "cidade": "Porto"},
-    {"hotel_id": "sky2","nome": "Hotel sky2", "estrelas": 4.8, "diaria": 195.99, "cidade": "Porto"}
-]
+from flask_restful import Resource, reqparse
+from models.hotel import HotelModel
 
 class Hoteis(Resource):
     def get(self):
-        return {"hoteis": lista_hoteis}
-    
-class Hoteis(Resource):
+        return { "hoteis": [hotel.json() for hotel in HotelModel.query.all()] }
+
+class Hotel(Resource):
     argumentos = reqparse.RequestParser()
-    argumentos.add_argument("nome", type=str, required=True, help="Nome do hotel é obrigatório")
-    argumentos.add_argument("estrelas", type=float, required=True, help="Estrelas do hotel é obrigatório")
-    argumentos.add_argument("diaria", type=float, required=True, help="Diária do hotel é obrigatória")
-    argumentos.add_argument("cidade", type=str, required=True, help="Cidade do hotel é obrigatória")
-    
-
-    def get(self, id_hotel):
-        for hotel in lista_hoteis:
-            if hotel["hotel_id"] == id_hotel:
-                return hotel, 200
+    argumentos.add_argument("nome", type=str, required=True, help="Nome obrigatório")
+    argumentos.add_argument("estrelas", type=float, required=True, help="Estrelas obrigatório")
+    argumentos.add_argument("diaria", type=float, required=True, help="Diária obrigatório")
+    argumentos.add_argument("cidade", type=str, required=True, help="Cidade obrigatório")
+   
+    def get(self, hotel_id):
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            return hotel.json(), 200
         return { "message": "Hotel not found" }, 404
+   
+    def post(self,hotel_id):
+        dados = Hotel.argumentos.parse_args() # Dicionário
+        if Hotel.find_hotel(hotel_id):
+            return { "message": "Hotel with this id already exists"}
+        try:
+            novo_hotel = HotelModel(hotel_id, **dados)
+            novo_hotel.save_hotel()
+        except:
+            return { "message": "An internal error ocurred trying to save hotel."}, 500
+   
+    def put(self,hotel_id):
+        dados = Hotel.argumentos.parse_args() # Dicionário
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            try:
+                hotel.update_hotel(dados["nome"], dados["estrelas"], dados["diaria"], dados["cidade"])
+                hotel.save_hotel()
+                return hotel.json(), 200
+            except:
+                return { "message": "An internal error ocurred trying to update hotel."}, 500
+        try:
+            novo_hotel = HotelModel(hotel_id, **dados)
+            novo_hotel.save_hotel()
+            return novo_hotel.json(), 201
+        except FileNotFoundError:
+            return { "message": "An internal error ocurred trying to create hotel."}, 500
 
-    def post(self, id_hotel):
-        dados = Hoteis.argumentos.parse_args()
-        for hotel in lista_hoteis:
-            if hotel["hotel_id"] == id_hotel:
-                return { "message": "Hotel with this id already exists"}        
-        novo_hotel = {"hotel_id": id_hotel, **dados}
-        lista_hoteis,append(novo_hotel)
-        return hotel, 200
-
-    def put(self, id_hotel):
-        dados = Hoteis.argumentos.parse_args()
-        for hotel in lista_hoteis:
-            if hotel["hotel_id"] == id_hotel:
-                hotel.update(dados)
-                return hotel, 200
-        return{"message": "Hotel not found"}, 404
-
-    def delete(self, id_hotel):
-        global lista_hoteis
-        lista_hoteis = [hotel for hotel in lista_hoteis if hotel["hotel_id"] != id_hotel]
-        return{"message": "Hotel deleted"}, 200
+    def delete(self, hotel_id):
+        hotel = HotelModel.find_hotel(hotel_id)
+        if hotel:
+            try:
+                hotel.delete_hotel()
+                return {"message": "Hotel deleted"}, 200
+            except:
+                return { "message": "An internal error ocurred trying to delete hotel."}, 500
+        return { "message": "Hotel not found."}, 404
