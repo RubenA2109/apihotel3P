@@ -1,13 +1,18 @@
 from flask import Flask
 from flask_restful import Resource, Api
 from resources.hotel import Hoteis, Hotel
+from resources.user import User, UserRegister, UserLogin, userLogout
 from conexao import bd
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "secret_key"  # Change this to a more secure key
+jwt = JWTManager(app)
 
 #Configurações
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///hoteis.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["PROPAGATE_EXCEPTIONS"] = "my_secret_key_has_to_be_always_sempre"  # Change this to a more secure key
 
 api = Api(app) 
 
@@ -15,6 +20,10 @@ api = Api(app)
 #Rotas
 api.add_resource(Hoteis, "/hoteis")
 api.add_resource(Hotel, "/hoteis/<string:hotel_id>")
+api.add_resource(User, "/users/<string:username>")
+api.add_resource(UserRegister, "/register")
+api.add_resource(UserLogin, "/login")
+api.add_resource(userLogout, "/logout")
 
 if __name__ == "__main__":
     bd.init_app(app)

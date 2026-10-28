@@ -1,0 +1,44 @@
+from conexao import bd
+
+class UserModel(bd.Model):
+    __tablename__ = "usuarios"
+
+    user_id = bd.Column(bd.Integer, primary_key=True)
+    username = bd.Column(bd.String(80))
+    password = bd.Column(bd.String(80))
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def json(self):
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "password": self.password,
+        }
+
+    @classmethod
+    def find_user(cls, username):
+        user = cls.query.filter_by(username=username).first()  # SELECT * FROM usuarios WHERE username=username LIMIT 1
+        if user:
+            return user
+        return None
+
+    def save_user(self):
+        bd.session.add(self)
+        bd.session.commit()
+
+    def update_user(self, username, password):
+        self.username = username
+        self.password = password
+
+    def delete_user(self):
+        bd.session.delete(self)
+        bd.session.commit()
+    
+    def update(self, nome, estrelas, diaria, cidade):
+        self.nome = nome
+        self.estrelas = estrelas
+        self.diaria = diaria
+        self.cidade = cidade
