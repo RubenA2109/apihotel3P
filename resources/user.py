@@ -3,7 +3,7 @@ from models.user import UserModel
 from hmac import compare_digest
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 
-class user(Resource):
+class User(Resource):
     def get(self, username):
         user = UserModel.find_user(username)
         if user:
@@ -45,7 +45,7 @@ class UserLogin(Resource):
         dados = UserLogin.argumentos.parse_args()
         user = UserModel.find_user(dados["username"])
         if user and compare_digest(user.password, dados["password"]):
-            token_de_acesso = create_access_token(identity=user.id)
+            token_de_acesso = create_access_token(identity=user.username)
             return { "access_token": token_de_acesso }, 200
         return { "message": "Invalid username or password" }, 401
 

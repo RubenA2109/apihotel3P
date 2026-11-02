@@ -21,7 +21,7 @@ api = Api(app)
 api.add_resource(Hoteis, "/hoteis")
 api.add_resource(Hotel, "/hoteis/<string:hotel_id>")
 api.add_resource(User, "/users/<string:username>")
-api.add_resource(UserRegister, "/register")
+api.add_resource(UserRegister, "/registar")
 api.add_resource(UserLogin, "/login")
 api.add_resource(userLogout, "/logout")
 
