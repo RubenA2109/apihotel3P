@@ -4,18 +4,18 @@ from resources.hotel import Hoteis, Hotel
 from resources.user import User, UserRegister, UserLogin, userLogout
 from conexao import bd
 from flask_jwt_extended import JWTManager
+from datetime import timedelta
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "secret_key"  # Change this to a more secure key
-jwt = JWTManager(app)
 
 #Configurações
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///hoteis.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["PROPAGATE_EXCEPTIONS"] = "my_secret_key_has_to_be_always_sempre"  # Change this to a more secure key
+app.config["JWT_SECRET_KEY"] = "my_secret_key_has_to_be_always_sempre"  # Change this to a more secure key
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=10)
 
+jwt = JWTManager(app)
 api = Api(app) 
-
 
 #Rotas
 api.add_resource(Hoteis, "/hoteis")
